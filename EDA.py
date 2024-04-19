@@ -1,12 +1,14 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import logging
+from pandas.plotting import scatter_matrix
 
 DATA_FOLDER = "data"
 FILE_NAME = "wind_dataset.csv"
 
 
-def read_csv_from_data_folder(filename):
+def read_csv_from_data_folder(filename: str) -> pd.DataFrame:
     """
     Read a CSV file from the data folder
     :param filename:
@@ -18,13 +20,13 @@ def read_csv_from_data_folder(filename):
     try:
         df = pd.read_csv(file_path)
     except FileNotFoundError:
-        print(f"File {file_path} not found.")
+        logging.error(f"File {file_path} not found.")
         return None
 
     return df
 
 
-def plot_feature_distribution(df: pd.DataFrame):
+def plot_feature_distribution(df: pd.DataFrame) -> None:
     """
     Plot the distribution of each feature in the DataFrame
     :param df:
@@ -35,7 +37,7 @@ def plot_feature_distribution(df: pd.DataFrame):
     plt.show()
 
 
-def plot_correlation_heatmap(df: pd.DataFrame):
+def plot_correlation_heatmap(df: pd.DataFrame) -> None:
     """
     Plot the correlation heatmap of the DataFrame
     :param df:
@@ -49,7 +51,14 @@ def plot_correlation_heatmap(df: pd.DataFrame):
     plt.show()
 
 
-def main():
+def plot_scatter_matrix(df: pd.DataFrame) -> None:
+    df_without_date = df.drop('DATE', axis=1)
+    scatter_matrix(df_without_date, alpha=0.2, figsize=(10, 10), diagonal='kde')
+    plt.tight_layout()
+    plt.show()
+
+
+def main() -> None:
     """
     Main function
     :return:
@@ -57,13 +66,14 @@ def main():
 
     df = read_csv_from_data_folder(FILE_NAME)
     if df is not None:
-        print(df.head())
-        print(df.info())
-        print(df.describe())
+        logging.info(df.head())
+        logging.info(df.info())
+        logging.info(df.describe())
         plot_feature_distribution(df)
         plot_correlation_heatmap(df)
+        plot_scatter_matrix(df)
 
 
-# This conditional is used to check whether this script is being run directly
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
